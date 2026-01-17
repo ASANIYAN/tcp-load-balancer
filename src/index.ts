@@ -34,7 +34,7 @@ function checkHealth() {
     socket.on("error", () => {
       clearTimeout(timeout);
       if (backend.healthy) {
-        console.log(`[Health] Port ${backend.port} is DOWN`);
+        console.log(`Health Port ${backend.port} is DOWN`);
       }
       backend.healthy = false;
       socket.destroy();
@@ -72,7 +72,7 @@ const server = net.createServer((clientSocket) => {
   }
 
   const { host, port } = backend;
-  console.log(`Client connected -> Routing to ${host}:${port}`);
+  console.log(`Client connected: Routing to ${host}:${port}`);
 
   const serverSocket = net.connect(port, host, () => {
     console.log(`Proxy established connection to target: ${port}`);
