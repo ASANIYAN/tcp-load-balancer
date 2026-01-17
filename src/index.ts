@@ -181,8 +181,7 @@ process.on("SIGTERM", () => {
     );
     clearInterval(checkInterval);
 
-    activeConnections.forEach((value, key, set) => {
-      const { clientSocket, serverSocket } = value;
+    activeConnections.forEach(({ clientSocket, serverSocket }) => {
       clientSocket.destroy();
       serverSocket.destroy();
     });
