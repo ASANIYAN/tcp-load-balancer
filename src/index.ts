@@ -16,7 +16,7 @@ function checkHealth() {
 
     const timeout = setTimeout(() => {
       if (backend.healthy) {
-        console.log(`[Health] Port ${backend.port} is DOWN`);
+        console.log(`Health Port ${backend.port} is DOWN`);
       }
       backend.healthy = false;
       socket.destroy();
@@ -61,6 +61,11 @@ function selectBackend() {
   return null;
 }
 
+const activeConnections: Set<{
+  clientSocket: net.Socket;
+  serverSocket: net.Socket;
+}> = new Set();
+
 const server = net.createServer((clientSocket) => {
   const backend = selectBackend();
 
@@ -77,6 +82,10 @@ const server = net.createServer((clientSocket) => {
   const serverSocket = net.connect(port, host, () => {
     console.log(`Proxy established connection to target: ${port}`);
   });
+
+  const connection = { clientSocket, serverSocket };
+  activeConnections.add(connection);
+  console.log(`Connection added: ${activeConnections.size}`);
 
   let clientPaused = false;
   let serverPaused = false;
@@ -109,9 +118,17 @@ const server = net.createServer((clientSocket) => {
     }
   });
 
+  let cleaned = false;
   const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
+
     clientSocket.destroy();
     serverSocket.destroy();
+
+    // Remove from tracking
+    activeConnections.delete(connection);
+    console.log(`Connection removed. Active: ${activeConnections.size}`);
   };
 
   clientSocket.on("end", () => serverSocket.end());
@@ -127,11 +144,49 @@ const server = net.createServer((clientSocket) => {
     cleanup();
   });
 
-  clientSocket.on("close", () => console.log("Client connection closed"));
+  clientSocket.on("close", () => {
+    if (!cleaned) cleanup();
+  });
+  serverSocket.on("close", () => {
+    if (!cleaned) cleanup();
+  });
 });
 
 server.listen(PROXY_PORT, () => {
   const ports = backends.map((b) => b.port).join(", ");
   console.log(`TCP Load Balancer running on port ${PROXY_PORT}`);
   console.log(`Monitoring backends: ${ports}\n`);
+});
+
+process.on("SIGTERM", () => {
+  console.log(`Received SIGTERM,Active connections: ${activeConnections.size}`);
+
+  server.close(() => {
+    console.log("Server closed. New connections not accepted");
+  });
+
+  const checkInterval = setInterval(() => {
+    console.log(`Waiting for ${activeConnections.size} connections to close`);
+
+    if (activeConnections.size === 0) {
+      clearInterval(checkInterval);
+      console.log("All connections gracefully closed");
+      process.exit(0);
+    }
+  }, 1000);
+
+  setTimeout(() => {
+    console.log(
+      `Timeout reached: All ${activeConnections.size} connections will be forcefully closed`
+    );
+    clearInterval(checkInterval);
+
+    activeConnections.forEach((value, key, set) => {
+      const { clientSocket, serverSocket } = value;
+      clientSocket.destroy();
+      serverSocket.destroy();
+    });
+
+    process.exit(1);
+  }, 30000);
 });
