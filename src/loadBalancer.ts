@@ -9,7 +9,6 @@ export class LoadBalancer {
   private server: net.Server | null;
   private backendPool: BackendPool;
   private healthChecker: HealthChecker;
-  private connection: Connection | null;
   private activeConnections: Set<{
     clientSocket: net.Socket;
     serverSocket: net.Socket;
@@ -24,7 +23,6 @@ export class LoadBalancer {
     );
     this.activeConnections = new Set();
     this.server = null;
-    this.connection = null;
   }
 
   start() {
@@ -57,7 +55,7 @@ export class LoadBalancer {
     this.activeConnections.add(connection);
     console.log(`Connection added: ${this.activeConnections.size}`);
 
-    this.connection = new Connection(clientSocket, serverSocket, () => {
+    const conn = new Connection(clientSocket, serverSocket, () => {
       this.activeConnections.delete(connection);
     });
   }
