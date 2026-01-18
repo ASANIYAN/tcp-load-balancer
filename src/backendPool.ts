@@ -33,8 +33,4 @@ export class BackendPool {
   getBackends() {
     return this.backends;
   }
-
-  getHealthyCount() {
-    return this.backends.filter((b) => b.healthy).length;
-  }
 }
