@@ -204,9 +204,3 @@ Key patterns that emerged:
 These patterns emerged naturally from asking "what makes this hard to test/understand?" and refactoring toward simplicity.
 
 ---
-
-## Conclusion
-
-This project solidified my understanding of how load balancers work and how the Transport Control Protocol operates. The three-way handshake for connection establishment and four-way handshake for connection termination. I learned how backpressure is critical when servers, services, or protocols communicate with one another. Without it, memory exhaustion is inevitable under load.
-
-The refactoring exercise taught me that good architecture is not just about clever code. It's about making the system easy to reason about, test, and change. When each class has a single, clear responsibility, the whole system becomes comprehensible.
