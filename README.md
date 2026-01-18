@@ -1,6 +1,6 @@
 # TCP Load Balancer
 
-A high-performance TCP load balancer built with Node.js and TypeScript featuring health checks, graceful shutdown, and backpressure handling.
+A TCP load balancer built with Node.js and TypeScript featuring health checks, graceful shutdown, and backpressure handling.
 
 ## Features
 
