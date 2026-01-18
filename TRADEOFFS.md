@@ -61,7 +61,7 @@ When a Connection encounters a backend error during active proxying, we log the 
 
 ### Connection Error Handling
 
-We separate error handling responsibilities:
+Separated error handling responsibilities:
 
 - **LoadBalancer** handles backend connection establishment errors (before Connection is created)
 - **Connection** handles errors during active proxying (after connection is established)
@@ -78,7 +78,7 @@ Making Connection responsible for creating the backend socket via an async `Conn
 
 ### Backpressure Handling
 
-We implemented pause/resume with per-socket state tracking (`clientPaused`, `serverPaused`).
+Implemented pause/resume with per-socket state tracking (`clientPaused`, `serverPaused`).
 
 **Why track pause state?**
 
@@ -104,7 +104,7 @@ Example: A client uploading a 1GB file to a slow backend. Without backpressure, 
 
 ### Round-Robin Over Original Array
 
-We loop over the original `backends` array and skip unhealthy ones, rather than filtering to a `healthyBackends` array first.
+Loops over the original `backends` array and skip unhealthy ones, rather than filtering to a `healthyBackends` array first.
 
 **Why?**
 
