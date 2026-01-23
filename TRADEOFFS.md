@@ -184,11 +184,11 @@ This gives failing backends breathing room to recover and prevents the thunderin
 
 ### Technical Insights
 
-The most surprising aspect was how many edge cases exist in a simple TCP proxying. Backpressure, half-close, socket states, cleanup sequencing. Each has subtle gotchas that only appear under load or failure conditions. Testing isn't optional; it's the only way to verify the system handles these cases correctly.
+The most surprising aspect was how many edge cases exist in a simple TCP proxying. Backpressure, half-close, socket states, cleanup sequencing. Each has subtle, unforeseen problems that only appear under load or failure conditions. Testing isn't optional; it's the only way to verify the system handles these cases correctly.
 
 ### Debugging Strategies
 
-**Chaos testing** proved invaluable: intentionally killing backends, simulating slow networks, creating load. Without deliberately breaking things, you don't discover bugs like socket leaks or index inconsistencies.
+**Chaos testing** proved invaluable: intentionally killing backends, simulating slow networks, and creating load. Without deliberately breaking things, you don't discover bugs like socket leaks or index inconsistencies.
 
 **Logging at state transitions** (connection open, close, health changes) made debugging easy to deal with.
 
